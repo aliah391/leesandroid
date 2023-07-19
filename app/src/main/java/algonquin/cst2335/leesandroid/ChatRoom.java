@@ -26,7 +26,7 @@ public class ChatRoom extends AppCompatActivity {
    // ArrayList<String> messages = new ArrayList<>();
 
     private ArrayList<ChatMessage> messages = new ArrayList<>();
-    ChatRoom(){}
+    public ChatRoom(){}
     private RecyclerView.Adapter myAdapter;
 
     @Override
@@ -54,7 +54,10 @@ public class ChatRoom extends AppCompatActivity {
 
             messages.add(cm);
             myAdapter.notifyItemInserted(messages.size() - 1);
+//            myAdapter.notifyItemRemoved(messages.size()-1);
+//            myAdapter.notifyDataSetChanged();
             binding.editText.setText("");
+
         });
 
         binding.receive.setOnClickListener(click -> {
@@ -66,9 +69,13 @@ public class ChatRoom extends AppCompatActivity {
 
             messages.add(cm);
             myAdapter.notifyItemInserted(messages.size() - 1);
+//            myAdapter.notifyItemRemoved(messages.size()-1);
+//            myAdapter.notifyDataSetChanged();
             binding.editText.setText("");
-        });
 
+
+        });
+        binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerview.setAdapter(myAdapter = new RecyclerView.Adapter<MyRowHolder>() {
 
             @NonNull
@@ -87,9 +94,12 @@ public class ChatRoom extends AppCompatActivity {
 
             @Override
             public void onBindViewHolder(@NonNull MyRowHolder holder, int position) {
+                holder.messageText.setText("");
+                holder.timeText.setText("");
                 ChatMessage message = messages.get(position);
-                holder.messageText.setText("Hey, how are you?");
-                holder.timeText.setText("3:00pm");
+                holder.messageText.setText(message.getMessage());
+                holder.timeText.setText(message.getTimeSent());
+                
             }
 
             @Override
@@ -99,14 +109,14 @@ public class ChatRoom extends AppCompatActivity {
 
             @Override
             public int getItemViewType(int position) {
-                ChatMessage message = messages.get(position);
-                if(position % 2 ==0){
+
+                if(messages.get(position).isSentButton == true){
                     return 0;
                 }
-                else return 1;
+                else{ return 1;}
             }
         });
-        binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
     class MyRowHolder extends RecyclerView.ViewHolder {
@@ -121,7 +131,5 @@ public class ChatRoom extends AppCompatActivity {
         }
     }
 
-    ChatRoom(String m, String t, boolean sent) {
 
-    }
 }
