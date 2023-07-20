@@ -54,9 +54,6 @@ public class ChatRoom extends AppCompatActivity {
 
                 List<ChatMessage> allMessages = mDAO.getAllMessages();
                 messages.addAll(allMessages);
-
-
-
         });
 
 
@@ -95,6 +92,12 @@ public class ChatRoom extends AppCompatActivity {
             String currentDateandTime = sdf.format(new Date());
             ChatMessage cm = new ChatMessage(message, currentDateandTime, false);
 
+            Executor thread1 = Executors.newSingleThreadExecutor();
+            thread1.execute(() ->{
+
+                cm.id = mDAO.insertMessage(cm);
+
+            });
             messages.add(cm);
             myAdapter.notifyItemInserted(messages.size() - 1);
 
@@ -157,8 +160,8 @@ public class ChatRoom extends AppCompatActivity {
         }
     }
 
-    class MyRowHolder extends RecyclerView.ViewHolder {
-        ArrayList<ChatMessage> messages  = new ArrayList<>();
+    protected class MyRowHolder extends RecyclerView.ViewHolder {
+//        ArrayList<ChatMessage> messages  = new ArrayList<>();
         TextView messageText;
         TextView timeText;
 
@@ -174,31 +177,27 @@ public class ChatRoom extends AppCompatActivity {
                 builder.setNegativeButton("No", (dialog, cl) -> { });
 
                 builder.setPositiveButton("yes", (dialog, cl)-> {
+
                     ChatMessage toDelete = messages.get(position);
-                     mDAO.deleteMessage(toDelete);
-                    messages.remove(position);
-                    myAdapter.notifyItemRemoved(position);
 
+                    Executor thread1 = Executors.newSingleThreadExecutor();
+                    thread1.execute(() ->
+                    {
+                        mDAO.deleteMessage(toDelete);
+                        messages.remove(position);
 
+                        runOnUiThread(()->{
+                        myAdapter.notifyDataSetChanged();});
 
-                    Snackbar.make(messageText, "You deleted message #" + position,Snackbar.LENGTH_LONG)
-                            .setAction("Undo", c -> {
-                                messages.add(position, toDelete);
-                                myAdapter.notifyItemInserted(position);
-                            })
-                            .show();
-
-
+                        Snackbar.make(messageText, "You deleted message #" + position,Snackbar.LENGTH_LONG)
+                                .setAction("Undo", c -> {
+                                    messages.add(position, toDelete);
+                                    myAdapter.notifyItemInserted(position);
+                                })
+                                .show();
+                    });
                 });
                 builder.create().show();
-
-
-
-//                Executor thread1 = Executors.newSingleThreadExecutor();
-//                thread1.execute(() ->{
-//
-//
-//                });
 
 
             });
