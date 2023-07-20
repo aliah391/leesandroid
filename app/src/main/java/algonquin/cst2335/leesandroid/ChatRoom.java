@@ -59,7 +59,7 @@ public class ChatRoom extends AppCompatActivity {
             FragmentManager fMgr = getSupportFragmentManager();
             FragmentTransaction tx = fMgr.beginTransaction();
             tx.add(R.id.fragmentLocation, chatFragment);
-            tx.addToBackStack("hello");
+            tx.addToBackStack("");
             tx.commit();
 
         } );
